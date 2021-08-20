@@ -24,15 +24,18 @@ struct Opt {
     /// West direction output
     #[structopt(short = "w", long = "west")]
     west: bool,
+    /// Pin number output
+    #[structopt(short = "p", long = "pin")]
+    show_pin: bool,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Side {
     TOP,
     BOTTOM,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Direction {
     NORTH,
     EAST,
@@ -42,9 +45,10 @@ pub enum Direction {
 
 #[derive(Debug)]
 pub struct Args {
-    side: Side,
-    direction: Direction,
-    input: std::path::PathBuf,
+    pub side: Side,
+    pub direction: Direction,
+    pub show_pin: bool,
+    pub input: std::path::PathBuf,
 }
 
 const ERR_SIDE: &str = "Both -t and -b are specified";
@@ -154,6 +158,7 @@ pub fn parse_args() -> Result<Args, String> {
         side: Side::TOP,
         direction: Direction::NORTH,
         input: opt.input,
+        show_pin: opt.show_pin,
     };
     args.side = match parse_side(opt.top, opt.bottom) {
         Err(err) => return Err(err),
