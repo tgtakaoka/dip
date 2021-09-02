@@ -18,19 +18,34 @@ pub enum DipWidth {
 }
 
 #[derive(Debug, PartialEq)]
+struct PinName {
+    name: String,
+}
+
+#[derive(Debug, PartialEq)]
 pub struct Dip {
-    pub name: String,              // IC name
-    pub title: String,             // IC title
-    pub dip: usize,                // pin count
-    pub width: DipWidth,           // package width
-    pins: BTreeMap<usize, String>, // names of pins
+    pub name: String,               // IC name
+    pub title: String,              // IC title
+    pub dip: usize,                 // pin count
+    pub width: DipWidth,            // package width
+    pins: BTreeMap<usize, PinName>, // names of pins
+}
+
+impl PinName {
+    fn name(&self) -> &str {
+        return &self.name;
+    }
+
+    fn name_chars(&self) -> Vec<String> {
+        return self
+            .name()
+            .graphemes(true)
+            .map(String::from)
+            .collect::<Vec<String>>();
+    }
 }
 
 impl Dip {
-    pub fn pin(&self, pin_number: usize) -> &str {
-        return &self.pins.get(&pin_number).unwrap();
-    }
-
     pub fn print(&self, dir: Direction, side: Side, show_pin: bool) -> Vec<String> {
         return match dir {
             Direction::NORTH => {
@@ -92,7 +107,7 @@ impl Dip {
         let mut r = rstart;
         for pos in 1..=self.dip / 2 {
             let mut line = String::new();
-            line.push_str(&print_right(lmax, &self.pin(l)));
+            line.push_str(&print_right(lmax, &self.pin(l).name()));
             if show_pin {
                 line.push_str(&format!("{pin:>width$}", pin = l, width = lpin));
             }
@@ -115,7 +130,7 @@ impl Dip {
             if show_pin {
                 line.push_str(&format!("{pin:<width$}", pin = r, width = rpin));
             }
-            line.push_str(&print_left(rmax, &self.pin(r)));
+            line.push_str(&print_left(rmax, &self.pin(r).name()));
             out.push(line);
 
             l = pin_step(l, lstart, lend);
@@ -215,11 +230,7 @@ impl Dip {
             let mut lines = vec![String::new(); name_max];
             let mut pin = start;
             for _ in 1..=self.dip / 2 {
-                let pin_chars = &self
-                    .pin(pin)
-                    .graphemes(true)
-                    .map(String::from)
-                    .collect::<Vec<String>>();
+                let pin_chars = &self.pin(pin).name_chars();
                 for l in 0..name_max {
                     let line = &mut lines[l];
                     line.push(' ');
@@ -273,11 +284,7 @@ impl Dip {
             let mut lines = vec![String::new(); name_max];
             let mut pin = start;
             for _ in 1..=self.dip / 2 {
-                let pin_chars = &self
-                    .pin(pin)
-                    .graphemes(true)
-                    .map(String::from)
-                    .collect::<Vec<String>>();
+                let pin_chars = &self.pin(pin).name_chars();
                 for l in 0..name_max {
                     let line = &mut lines[l];
                     line.push(' ');
@@ -310,10 +317,14 @@ impl Dip {
             .collect::<Vec<String>>();
     }
 
+    fn pin(&self, pin_number: usize) -> &PinName {
+        return &self.pins.get(&pin_number).unwrap();
+    }
+
     fn max_name_len(&self, start: usize, end: usize) -> usize {
         let mut name_width = 0;
         for p in min(start, end)..=max(start, end) {
-            let len = self.pin(p).graphemes(true).count();
+            let len = self.pin(p).name_chars().len();
             if len > name_width {
                 name_width = len;
             }
@@ -375,9 +386,9 @@ impl fmt::Display for Dip {
         write!(f, "package=DIP{} withd={:?} ", self.dip, self.width)?;
         write!(f, "pins=[")?;
         for pin in 1..self.dip {
-            write!(f, "{} ", self.pin(pin))?;
+            write!(f, "{} ", self.pin(pin).name())?;
         }
-        write!(f, "{}]]", self.pin(self.dip))
+        write!(f, "{}]]", self.pin(self.dip).name())
     }
 }
 
@@ -429,7 +440,7 @@ impl FromStr for Dip {
             },
         };
 
-        match Dip::pins_to_vec_result(toml, dip) {
+        match pins_to_vec_result(toml, dip) {
             Err(err) => return Err(err),
             Ok(pins) => {
                 return Ok(Dip {
@@ -444,37 +455,44 @@ impl FromStr for Dip {
     }
 }
 
-impl Dip {
-    fn pins_to_vec_result(
-        toml: &Map<String, Value>,
-        dip: usize,
-    ) -> Result<BTreeMap<usize, String>, String> {
-        let mut pins = BTreeMap::new();
-        for pin in toml.keys() {
-            if let Ok(n) = pin.parse::<usize>() {
-                if n == 0 {
-                    return Err("invalid pin number 0".to_string());
-                }
-                if n > dip {
-                    return Err(format!(
-                        "pin number {} must not be greater than dip {}",
-                        n, dip
-                    ));
-                }
-                match toml.get(pin).unwrap().as_str() {
-                    None => return Err(format!("name for pin {} must be string", n)),
-                    Some(name) => pins.insert(n, name.to_string()),
-                };
-            }
-        }
-
-        for p in 1..=dip {
-            if !pins.contains_key(&p) {
-                return Err(format!("missing pin {} definition", p));
-            }
-        }
-        return Ok(pins);
+impl FromStr for PinName {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        return Ok(PinName {
+            name: s.to_string(),
+        });
     }
+}
+
+fn pins_to_vec_result(
+    toml: &Map<String, Value>,
+    dip: usize,
+) -> Result<BTreeMap<usize, PinName>, String> {
+    let mut pins = BTreeMap::new();
+    for pin in toml.keys() {
+        if let Ok(n) = pin.parse::<usize>() {
+            if n == 0 {
+                return Err("invalid pin number 0".to_string());
+            }
+            if n > dip {
+                return Err(format!(
+                    "pin number {} must not be greater than dip {}",
+                    n, dip
+                ));
+            }
+            match toml.get(pin).unwrap().as_str() {
+                None => return Err(format!("name for pin {} must be string", n)),
+                Some(name) => pins.insert(n, PinName::from_str(name).unwrap()),
+            };
+        }
+    }
+
+    for p in 1..=dip {
+        if !pins.contains_key(&p) {
+            return Err(format!("missing pin {} definition", p));
+        }
+    }
+    return Ok(pins);
 }
 
 #[test]
@@ -495,10 +513,10 @@ fn test_dip_decode() {
     assert_eq!("ATtiny412-SS", dip.title);
     assert_eq!(4, dip.dip);
     assert_eq!(DipWidth::MIL300, dip.width);
-    assert_eq!("VDD", dip.pin(1));
-    assert_eq!("PA6", dip.pin(2));
-    assert_eq!("PA7", dip.pin(3));
-    assert_eq!("PA1", dip.pin(4));
+    assert_eq!("VDD", dip.pin(1).name());
+    assert_eq!("PA6", dip.pin(2).name());
+    assert_eq!("PA7", dip.pin(3).name());
+    assert_eq!("PA1", dip.pin(4).name());
 
     assert_eq!(
         "ATtiny412",
