@@ -27,6 +27,9 @@ struct Opt {
     /// Pin number output
     #[structopt(short = "p", long = "pin")]
     show_pin: bool,
+    /// Alternate names output
+    #[structopt(short = "a", long = "alt")]
+    show_alt: bool,
 }
 
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -48,6 +51,7 @@ pub struct Args {
     pub side: Side,
     pub direction: Direction,
     pub show_pin: bool,
+    pub show_alt: bool,
     pub input: std::path::PathBuf,
 }
 
@@ -159,6 +163,7 @@ pub fn parse_args() -> Result<Args, String> {
         direction: Direction::NORTH,
         input: opt.input,
         show_pin: opt.show_pin,
+        show_alt: opt.show_alt,
     };
     args.side = match parse_side(opt.top, opt.bottom) {
         Err(err) => return Err(err),

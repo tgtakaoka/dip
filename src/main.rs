@@ -31,7 +31,7 @@ fn main() {
             exit(3);
         }
         Ok(dip) => {
-            for line in dip.print(args.direction, args.side, args.show_pin) {
+            for line in dip.print(args.direction, args.side, args.show_pin, args.show_alt) {
                 println!("{}", line);
             }
         }

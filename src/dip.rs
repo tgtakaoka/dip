@@ -19,7 +19,7 @@ pub enum DipWidth {
 
 #[derive(Debug, PartialEq)]
 struct PinName {
-    name: String,
+    names: String,
 }
 
 #[derive(Debug, PartialEq)]
@@ -32,26 +32,109 @@ pub struct Dip {
 }
 
 impl PinName {
+    fn names(&self) -> Vec<&str> {
+        return self.names.split(',').map(str::trim).collect();
+    }
+
     fn name(&self) -> &str {
-        return &self.name;
+        return self.names().get(0).unwrap();
+    }
+
+    fn names_horizontal(&self, show_alt: bool, names_max: &Vec<usize>, left: bool) -> String {
+        if !show_alt {
+            return self.name().to_string();
+        }
+        let column = names_max.len();
+        let names: Vec<&str> = self.names();
+        let mut line = String::new();
+        for i in 0..column {
+            if left {
+                let n = column - i - 1;
+                if n >= names.len() {
+                    line.push_str(&print_spaces(names_max[n]));
+                } else {
+                    line.push_str(&print_right(names_max[n], names[n]));
+                }
+            } else {
+                if i < names.len() {
+                    line.push_str(&print_left(names_max[i], names[i]));
+                }
+            }
+            if i < column - 1 {
+                line.push(' ');
+            }
+        }
+        return line;
+    }
+
+    fn names_vertical(&self, show_alt: bool, names_max: &Vec<usize>, top: bool) -> Vec<String> {
+        if !show_alt {
+            let height = names_max[0];
+            return if top {
+                print_bottom(height, self.name())
+            } else {
+                print_top(height, self.name())
+            };
+        }
+        let column = names_max.len();
+        let names: Vec<&str> = self.names();
+        let mut out: Vec<String> = Vec::new();
+        for i in 0..column {
+            if top {
+                let n = column - 1 - i;
+                let text = if n < names.len() { names[n] } else { "" };
+                out.append(&mut print_bottom(names_max[n], text));
+            } else {
+                let text = if i < names.len() { names[i] } else { "" };
+                out.append(&mut print_top(names_max[i], text));
+            }
+            if i < column - 1 {
+                out.push(String::from(" "));
+            }
+        }
+        return out;
     }
 }
 
 impl Dip {
-    pub fn print(&self, dir: Direction, side: Side, show_pin: bool) -> Vec<String> {
+    pub fn print(&self, dir: Direction, side: Side, show_pin: bool, show_alt: bool) -> Vec<String> {
         return match dir {
-            Direction::NORTH => {
-                self.print_vertical(side, show_pin, 1, self.dip / 2, self.dip, self.dip / 2 + 1)
-            }
-            Direction::SOUTH => {
-                self.print_vertical(side, show_pin, self.dip / 2 + 1, self.dip, self.dip / 2, 1)
-            }
-            Direction::EAST => {
-                self.print_horizontal(side, show_pin, self.dip / 2, 1, self.dip / 2 + 1, self.dip)
-            }
-            Direction::WEST => {
-                self.print_horizontal(side, show_pin, self.dip, self.dip / 2 + 1, 1, self.dip / 2)
-            }
+            Direction::NORTH => self.print_vertical(
+                side,
+                show_pin,
+                show_alt,
+                1,
+                self.dip / 2,
+                self.dip,
+                self.dip / 2 + 1,
+            ),
+            Direction::SOUTH => self.print_vertical(
+                side,
+                show_pin,
+                show_alt,
+                self.dip / 2 + 1,
+                self.dip,
+                self.dip / 2,
+                1,
+            ),
+            Direction::EAST => self.print_horizontal(
+                side,
+                show_pin,
+                show_alt,
+                self.dip / 2,
+                1,
+                self.dip / 2 + 1,
+                self.dip,
+            ),
+            Direction::WEST => self.print_horizontal(
+                side,
+                show_pin,
+                show_alt,
+                self.dip,
+                self.dip / 2 + 1,
+                1,
+                self.dip / 2,
+            ),
         };
     }
 
@@ -59,6 +142,7 @@ impl Dip {
         &self,
         side: Side,
         show_pin: bool,
+        show_alt: bool,
         left_start: usize,
         left_end: usize,
         right_start: usize,
@@ -68,8 +152,8 @@ impl Dip {
             Side::TOP => (left_start, left_end, right_start, right_end),
             Side::BOTTOM => (right_start, right_end, left_start, left_end),
         };
-        let lmax = self.max_name_len(lstart, lend);
-        let rmax = self.max_name_len(rstart, rend);
+        let (lmax, lmaxes) = self.max_name_len(lstart, lend, show_alt);
+        let (rmax, rmaxes) = self.max_name_len(rstart, rend, show_alt);
         let lpin = if show_pin {
             self.max_pin_len(lstart, lend) + 2
         } else {
@@ -80,7 +164,6 @@ impl Dip {
         } else {
             0
         };
-        let width = lmax + lpin + 1 + self.dip_width() + 1 + rpin + rmax;
 
         let mut out = Vec::new();
         let mut line = String::new();
@@ -99,19 +182,23 @@ impl Dip {
         let mut r = rstart;
         for pos in 1..=self.dip / 2 {
             let mut line = String::new();
-            line.push_str(&print_right(lmax, &self.pin(l).name()));
+            line.push_str(&print_right(
+                lmax,
+                &self.pin(l).names_horizontal(show_alt, &lmaxes, true),
+            ));
             if show_pin {
-                line.push_str(&format!("{pin:>width$}", pin = l, width = lpin));
+                line.push_str(&print_right(lpin, &l.to_string()));
             }
 
             let spc = if pos == self.dip / 2 { '_' } else { ' ' };
             line.push('|');
             for c in 0..self.dip_width() {
+                let print_name = side == Side::TOP && c == center;
                 if l == 1 && c == 0 {
                     line.push('*');
                 } else if r == 1 && c == right {
                     line.push('*');
-                } else if c == center && (pos >= top && pos < bottom) && side == Side::TOP {
+                } else if print_name && pos >= top && pos < bottom {
                     line += &name_chars[pos - top];
                 } else {
                     line.push(spc);
@@ -120,17 +207,20 @@ impl Dip {
             line.push('|');
 
             if show_pin {
-                line.push_str(&format!("{pin:<width$}", pin = r, width = rpin));
+                line.push_str(&print_left(rpin, &r.to_string()));
             }
-            line.push_str(&print_left(rmax, &self.pin(r).name()));
+            line.push_str(&print_left(
+                rmax,
+                &self.pin(r).names_horizontal(show_alt, &rmaxes, false),
+            ));
             out.push(line);
 
             l = pin_step(l, lstart, lend);
             r = pin_step(r, rstart, rend);
         }
         if show_pin {
-            let max = (width + self.title.len()) / 2;
-            out.push(print_right(max, &self.title));
+            let width = lmax + lpin + 1 + (self.dip_width() + self.title.len()) / 2;
+            out.push(print_right(width, &self.title));
         }
         return out;
     }
@@ -146,6 +236,7 @@ impl Dip {
         &self,
         side: Side,
         show_pin: bool,
+        show_alt: bool,
         top_start: usize,
         top_end: usize,
         bottom_start: usize,
@@ -158,7 +249,7 @@ impl Dip {
         let height = self.dip_height();
 
         let mut out = Vec::new();
-        self.print_pins(tstart, tend, show_pin, true, &mut out);
+        self.print_pins_vertical(tstart, tend, show_pin, show_alt, true, &mut out);
         let center = height / 2 + 1;
         let name_chars = self.name_chars();
         let left = (self.dip - name_chars.len()) / 2;
@@ -197,94 +288,75 @@ impl Dip {
             });
             out.push(line);
         }
-        self.print_pins(bstart, bend, show_pin, false, &mut out);
+        self.print_pins_vertical(bstart, bend, show_pin, show_alt, false, &mut out);
 
         if show_pin {
-            let max = (self.dip + 1 + self.title.len()) / 2;
-            out.push(print_right(max, &self.title));
+            let width = (self.dip + 1 + self.title.len()) / 2;
+            out.push(print_right(width, &self.title));
         }
         return out;
     }
 
-    fn print_pins(
+    fn print_pins_vertical(
         &self,
         start: usize,
         end: usize,
         show_pin: bool,
+        show_alt: bool,
         top: bool,
         out: &mut Vec<String>,
     ) {
-        let name_max = self.max_name_len(start, end);
-        let pin_width = if show_pin {
-            self.max_pin_len(start, end)
-        } else {
-            0
-        };
+        let (name_max, names_max) = self.max_name_len(start, end, show_alt);
+        let pin_width = self.max_pin_len(start, end);
+        let mut names = vec![String::new(); name_max];
+        let mut pins = vec![String::new(); pin_width];
+        let mut pin = start;
         if top {
-            let mut lines = vec![String::new(); name_max];
-            let mut pin = start;
             for _ in 1..=self.dip / 2 {
-                let pin_chars = print_bottom(name_max, self.pin(pin).name());
+                let pin_chars = self.pin(pin).names_vertical(show_alt, &names_max, top);
                 for l in 0..name_max {
-                    let line = &mut lines[l];
+                    let line = &mut names[l];
                     line.push(' ');
                     line.push_str(&pin_chars[l]);
                 }
+                if show_pin {
+                    let pin_number = print_bottom(pin_width, &pin.to_string());
+                    for l in 0..pin_width {
+                        let line = &mut pins[l];
+                        line.push(' ');
+                        line.push_str(&pin_number[l]);
+                    }
+                }
                 pin = pin_step(pin, start, end);
             }
-            for l in (0..name_max).rev() {
-                out.push(String::from(&lines[l]));
-            }
+            out.append(&mut names);
             if show_pin {
-                out.push(String::from(""));
-                for l in 0..pin_width {
-                    let mut line = String::new();
-                    let mut pin = start;
-                    for _ in 1..=self.dip / 2 {
-                        line.push(' ');
-                        line.push(match l {
-                            0 if pin < 10 => ' ',
-                            0 => char::from_digit((pin / 10) as u32, 10).unwrap(),
-                            _ => char::from_digit((pin % 10) as u32, 10).unwrap(),
-                        });
-                        pin = pin_step(pin, start, end);
-                    }
-                    out.push(line);
-                }
+                out.push(String::from(" "));
+                out.append(&mut pins);
             }
         } else {
-            if show_pin {
-                for l in 0..pin_width {
-                    let mut line = String::new();
-                    let mut pin = start;
-                    for _ in 1..=self.dip / 2 {
-                        line.push(' ');
-                        line.push(match l {
-                            0 if pin < 10 => char::from_digit(pin as u32, 10).unwrap(),
-                            0 => char::from_digit((pin / 10) as u32, 10).unwrap(),
-                            1 if pin < 10 => ' ',
-                            _ => char::from_digit((pin % 10) as u32, 10).unwrap(),
-                        });
-                        pin = pin_step(pin, start, end);
-                    }
-                    out.push(line);
-                }
-                out.push(String::from(""));
-            }
-            let mut lines = vec![String::new(); name_max];
-            let mut pin = start;
             for _ in 1..=self.dip / 2 {
-                let pin_chars = print_top(name_max, self.pin(pin).name());
+                if show_pin {
+                    let pin_number = print_top(pin_width, &pin.to_string());
+                    for l in 0..pin_width {
+                        let line = &mut pins[l];
+                        line.push(' ');
+                        line.push_str(&pin_number[l]);
+                    }
+                }
+                let pin_chars = self.pin(pin).names_vertical(show_alt, &names_max, top);
                 for l in 0..name_max {
-                    let line = &mut lines[l];
+                    let line = &mut names[l];
                     line.push(' ');
                     line.push_str(&pin_chars[l]);
                 }
                 pin = pin_step(pin, start, end);
             }
-            for l in 0..name_max {
-                out.push(String::from(&lines[l]));
+            if show_pin {
+                out.append(&mut pins);
+                out.push(String::from(" "));
             }
+            out.append(&mut names);
         }
     }
 
@@ -307,15 +379,29 @@ impl Dip {
         return &self.pins.get(&pin_number).unwrap();
     }
 
-    fn max_name_len(&self, start: usize, end: usize) -> usize {
-        let mut name_width = 0;
+    fn max_name_len(&self, start: usize, end: usize, show_alt: bool) -> (usize, Vec<usize>) {
+        let mut names_max = Vec::new();
         for p in min(start, end)..=max(start, end) {
-            let len = self.pin(p).name().graphemes(true).count();
-            if len > name_width {
-                name_width = len;
+            for (i, name) in self.pin(p).names().iter().enumerate() {
+                let len = name.graphemes(true).count();
+                if names_max.len() <= i {
+                    names_max.push(0);
+                }
+                if names_max[i] < len {
+                    names_max[i] = len;
+                }
             }
         }
-        return name_width;
+        return (
+            if show_alt {
+                let sum: usize = names_max.iter().sum();
+                let spaces = names_max.len() - 1;
+                sum + spaces
+            } else {
+                names_max[0]
+            },
+            names_max,
+        );
     }
 
     fn max_pin_len(&self, start: usize, end: usize) -> usize {
@@ -363,8 +449,10 @@ fn print_bottom(height: usize, text: &str) -> Vec<String> {
         .collect::<Vec<String>>();
     let len = chars.len();
     let mut out: Vec<String> = Vec::new();
-    for _ in 0..(height - len) {
-        out.push(String::from(" "));
+    if height > len {
+        for _ in 0..(height - len) {
+            out.push(String::from(" "));
+        }
     }
     out.append(&mut chars);
     return out;
@@ -462,7 +550,7 @@ impl FromStr for PinName {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         return Ok(PinName {
-            name: s.to_string(),
+            names: s.to_string(),
         });
     }
 }
