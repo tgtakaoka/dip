@@ -35,14 +35,6 @@ impl PinName {
     fn name(&self) -> &str {
         return &self.name;
     }
-
-    fn name_chars(&self) -> Vec<String> {
-        return self
-            .name()
-            .graphemes(true)
-            .map(String::from)
-            .collect::<Vec<String>>();
-    }
 }
 
 impl Dip {
@@ -137,7 +129,8 @@ impl Dip {
             r = pin_step(r, rstart, rend);
         }
         if show_pin {
-            out.push(print_center(width, &self.title));
+            let max = (width + self.title.len()) / 2;
+            out.push(print_right(max, &self.title));
         }
         return out;
     }
@@ -207,7 +200,8 @@ impl Dip {
         self.print_pins(bstart, bend, show_pin, false, &mut out);
 
         if show_pin {
-            out.push(print_center(self.dip + 1, &self.title));
+            let max = (self.dip + 1 + self.title.len()) / 2;
+            out.push(print_right(max, &self.title));
         }
         return out;
     }
@@ -230,15 +224,11 @@ impl Dip {
             let mut lines = vec![String::new(); name_max];
             let mut pin = start;
             for _ in 1..=self.dip / 2 {
-                let pin_chars = &self.pin(pin).name_chars();
+                let pin_chars = print_bottom(name_max, self.pin(pin).name());
                 for l in 0..name_max {
                     let line = &mut lines[l];
                     line.push(' ');
-                    if l < pin_chars.len() {
-                        line.push_str(&pin_chars[pin_chars.len() - l - 1]);
-                    } else {
-                        line.push(' ')
-                    }
+                    line.push_str(&pin_chars[l]);
                 }
                 pin = pin_step(pin, start, end);
             }
@@ -284,15 +274,11 @@ impl Dip {
             let mut lines = vec![String::new(); name_max];
             let mut pin = start;
             for _ in 1..=self.dip / 2 {
-                let pin_chars = &self.pin(pin).name_chars();
+                let pin_chars = print_top(name_max, self.pin(pin).name());
                 for l in 0..name_max {
                     let line = &mut lines[l];
                     line.push(' ');
-                    if l < pin_chars.len() {
-                        line.push_str(&pin_chars[l]);
-                    } else {
-                        line.push(' ')
-                    }
+                    line.push_str(&pin_chars[l]);
                 }
                 pin = pin_step(pin, start, end);
             }
@@ -324,7 +310,7 @@ impl Dip {
     fn max_name_len(&self, start: usize, end: usize) -> usize {
         let mut name_width = 0;
         for p in min(start, end)..=max(start, end) {
-            let len = self.pin(p).name_chars().len();
+            let len = self.pin(p).name().graphemes(true).count();
             if len > name_width {
                 name_width = len;
             }
@@ -341,15 +327,6 @@ fn pin_step(pin: usize, start: usize, end: usize) -> usize {
     return if start < end { pin + 1 } else { pin - 1 };
 }
 
-fn print_center(width: usize, text: &str) -> String {
-    let mut out = String::new();
-    if width >= text.len() {
-        out.push_str(&print_spaces((width - text.len()) / 2));
-    }
-    out.push_str(text);
-    return out;
-}
-
 fn print_left(width: usize, text: &str) -> String {
     let mut out = String::from(text);
     if width >= text.len() {
@@ -364,6 +341,32 @@ fn print_right(width: usize, text: &str) -> String {
         out.push_str(&print_spaces(width - text.len()));
     }
     out.push_str(text);
+    return out;
+}
+
+fn print_top(height: usize, text: &str) -> Vec<String> {
+    let mut out = text
+        .graphemes(true)
+        .map(String::from)
+        .collect::<Vec<String>>();
+    let len = out.len();
+    for _ in 0..(height - len) {
+        out.push(String::from(" "));
+    }
+    return out;
+}
+
+fn print_bottom(height: usize, text: &str) -> Vec<String> {
+    let mut chars = text
+        .graphemes(true)
+        .map(String::from)
+        .collect::<Vec<String>>();
+    let len = chars.len();
+    let mut out: Vec<String> = Vec::new();
+    for _ in 0..(height - len) {
+        out.push(String::from(" "));
+    }
+    out.append(&mut chars);
     return out;
 }
 
@@ -640,4 +643,16 @@ fn test_decode_error() {
         .err(),
         Some("missing pin 3 definition".to_string())
     );
+}
+
+#[test]
+fn test_print_left_right() {
+    assert_eq!(print_left(5, "AB"), "AB   ");
+    assert_eq!(print_right(5, "AB"), "   AB");
+}
+
+#[test]
+fn test_print_top_bottom() {
+    assert_eq!(print_top(5, "AB"), vec!["A", "B", " ", " ", " "]);
+    assert_eq!(print_bottom(5, "AB"), vec![" ", " ", " ", "A", "B"]);
 }
