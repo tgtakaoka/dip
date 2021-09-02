@@ -19,12 +19,11 @@ pub enum DipWidth {
 
 #[derive(Debug, PartialEq)]
 pub struct Dip {
-    pub name: String,            // IC name
-    pub name_chars: Vec<String>, // Grapheme list of name
-    pub title: String,           // IC title
-    pub dip: usize,              // pin count
-    pub width: DipWidth,         // package width
-    pub pins: Vec<String>,       // names of pins
+    pub name: String,      // IC name
+    pub title: String,     // IC title
+    pub dip: usize,        // pin count
+    pub width: DipWidth,   // package width
+    pub pins: Vec<String>, // names of pins
 }
 
 impl Dip {
@@ -78,7 +77,8 @@ impl Dip {
         line.push_str(&print_chars(self.dip_width(), '_'));
         out.push(line);
 
-        let num_chars = self.name_chars.len();
+        let name_chars = self.name_chars();
+        let num_chars = name_chars.len();
         let top = (self.dip / 2 - num_chars) / 2 + 1;
         let bottom = top + num_chars;
         let center = self.dip_width() / 2;
@@ -101,7 +101,7 @@ impl Dip {
                 } else if r == 1 && c == right {
                     line.push('*');
                 } else if c == center && (pos >= top && pos < bottom) && side == Side::TOP {
-                    line += &self.name_chars[pos - top];
+                    line += &name_chars[pos - top];
                 } else {
                     line.push(spc);
                 }
@@ -148,8 +148,9 @@ impl Dip {
         let mut out = Vec::new();
         self.print_pins(tstart, tend, show_pin, true, &mut out);
         let center = height / 2 + 1;
-        let left = (self.dip - self.name_chars.len()) / 2;
-        let right = left + self.name_chars.len();
+        let name_chars = self.name_chars();
+        let left = (self.dip - name_chars.len()) / 2;
+        let right = left + name_chars.len();
         for l in 1..=height {
             let mut line = String::new();
             let print_name = side == Side::TOP && l == center;
@@ -161,7 +162,7 @@ impl Dip {
                     1 if l == 1 || l == height => "+",
                     1 => "|",
                     _ if l == 1 || l == height => "-",
-                    _ if print_name && c >= left && c < right => &self.name_chars[c - left],
+                    _ if print_name && c >= left && c < right => &name_chars[c - left],
                     _ => " ",
                 });
                 line.push_str(match pos {
@@ -171,9 +172,7 @@ impl Dip {
                     _ if l == 1 || l == height => "-",
                     _ if l == 2 && t == 1 => "*",
                     _ if l == height - 1 && b == 1 => "*",
-                    _ if print_name && c + 1 >= left && c + 1 < right => {
-                        &self.name_chars[c + 1 - left]
-                    }
+                    _ if print_name && c + 1 >= left && c + 1 < right => &name_chars[c + 1 - left],
                     _ => " ",
                 });
                 t = pin_step(t, tstart, tend);
@@ -297,6 +296,14 @@ impl Dip {
         };
     }
 
+    fn name_chars(&self) -> Vec<String> {
+        return self
+            .name
+            .graphemes(true)
+            .map(String::from)
+            .collect::<Vec<String>>();
+    }
+
     fn max_name_len(&self, start: usize, end: usize) -> usize {
         let mut name_width = 0;
         for p in min(start, end)..=max(start, end) {
@@ -384,10 +391,6 @@ impl FromStr for Dip {
                 Some(str) => str.to_string(),
             },
         };
-        let name_chars = name
-            .graphemes(true)
-            .map(String::from)
-            .collect::<Vec<String>>();
 
         let title = match toml.get("title") {
             None => name.to_string(),
@@ -425,7 +428,6 @@ impl FromStr for Dip {
             Ok(pins) => {
                 return Ok(Dip {
                     name,
-                    name_chars,
                     title,
                     dip,
                     width,
