@@ -19,14 +19,18 @@ pub enum DipWidth {
 
 #[derive(Debug, PartialEq)]
 pub struct Dip {
-    pub name: String,      // IC name
-    pub title: String,     // IC title
-    pub dip: usize,        // pin count
-    pub width: DipWidth,   // package width
-    pub pins: Vec<String>, // names of pins
+    pub name: String,              // IC name
+    pub title: String,             // IC title
+    pub dip: usize,                // pin count
+    pub width: DipWidth,           // package width
+    pins: BTreeMap<usize, String>, // names of pins
 }
 
 impl Dip {
+    pub fn pin(&self, pin_number: usize) -> &str {
+        return &self.pins.get(&pin_number).unwrap();
+    }
+
     pub fn print(&self, dir: Direction, side: Side, show_pin: bool) -> Vec<String> {
         return match dir {
             Direction::NORTH => {
@@ -88,7 +92,7 @@ impl Dip {
         let mut r = rstart;
         for pos in 1..=self.dip / 2 {
             let mut line = String::new();
-            line.push_str(&print_right(lmax, &self.pins[l]));
+            line.push_str(&print_right(lmax, &self.pin(l)));
             if show_pin {
                 line.push_str(&format!("{pin:>width$}", pin = l, width = lpin));
             }
@@ -111,7 +115,7 @@ impl Dip {
             if show_pin {
                 line.push_str(&format!("{pin:<width$}", pin = r, width = rpin));
             }
-            line.push_str(&print_left(rmax, &self.pins[r]));
+            line.push_str(&print_left(rmax, &self.pin(r)));
             out.push(line);
 
             l = pin_step(l, lstart, lend);
@@ -211,7 +215,8 @@ impl Dip {
             let mut lines = vec![String::new(); name_max];
             let mut pin = start;
             for _ in 1..=self.dip / 2 {
-                let pin_chars = &self.pins[pin]
+                let pin_chars = &self
+                    .pin(pin)
                     .graphemes(true)
                     .map(String::from)
                     .collect::<Vec<String>>();
@@ -268,7 +273,8 @@ impl Dip {
             let mut lines = vec![String::new(); name_max];
             let mut pin = start;
             for _ in 1..=self.dip / 2 {
-                let pin_chars = &self.pins[pin]
+                let pin_chars = &self
+                    .pin(pin)
                     .graphemes(true)
                     .map(String::from)
                     .collect::<Vec<String>>();
@@ -307,7 +313,7 @@ impl Dip {
     fn max_name_len(&self, start: usize, end: usize) -> usize {
         let mut name_width = 0;
         for p in min(start, end)..=max(start, end) {
-            let len = self.pins[p].graphemes(true).count();
+            let len = self.pin(p).graphemes(true).count();
             if len > name_width {
                 name_width = len;
             }
@@ -369,9 +375,9 @@ impl fmt::Display for Dip {
         write!(f, "package=DIP{} withd={:?} ", self.dip, self.width)?;
         write!(f, "pins=[")?;
         for pin in 1..self.dip {
-            write!(f, "{} ", self.pins[pin])?;
+            write!(f, "{} ", self.pin(pin))?;
         }
-        write!(f, "{}]]", self.pins[self.dip])
+        write!(f, "{}]]", self.pin(self.dip))
     }
 }
 
@@ -439,7 +445,10 @@ impl FromStr for Dip {
 }
 
 impl Dip {
-    fn pins_to_vec_result(toml: &Map<String, Value>, dip: usize) -> Result<Vec<String>, String> {
+    fn pins_to_vec_result(
+        toml: &Map<String, Value>,
+        dip: usize,
+    ) -> Result<BTreeMap<usize, String>, String> {
         let mut pins = BTreeMap::new();
         for pin in toml.keys() {
             if let Ok(n) = pin.parse::<usize>() {
@@ -459,15 +468,12 @@ impl Dip {
             }
         }
 
-        let mut names = Vec::with_capacity(dip + 1);
-        names.push("<pin0>".to_string());
         for p in 1..=dip {
             if !pins.contains_key(&p) {
                 return Err(format!("missing pin {} definition", p));
             }
-            names.push(pins.get(&p).unwrap().to_string());
         }
-        return Ok(names);
+        return Ok(pins);
     }
 }
 
@@ -489,10 +495,10 @@ fn test_dip_decode() {
     assert_eq!("ATtiny412-SS", dip.title);
     assert_eq!(4, dip.dip);
     assert_eq!(DipWidth::MIL300, dip.width);
-    assert_eq!("VDD", dip.pins[1]);
-    assert_eq!("PA6", dip.pins[2]);
-    assert_eq!("PA7", dip.pins[3]);
-    assert_eq!("PA1", dip.pins[4]);
+    assert_eq!("VDD", dip.pin(1));
+    assert_eq!("PA6", dip.pin(2));
+    assert_eq!("PA7", dip.pin(3));
+    assert_eq!("PA1", dip.pin(4));
 
     assert_eq!(
         "ATtiny412",
