@@ -42,24 +42,26 @@ comma, like so. `dip` can generate bottom-side as well view which can
 be handy for soldering.
 
 ```
-$ grep PB3 atmega328p_megacorex.toml
+$ grep PB3 atmega328p_minicore.toml
 17 = "PB3, D11, MOSI, OC2A"
-$ dip --alt atmega328p_megacorex.toml
-               _____
-#RESET D22 PC6|*    |PC5  D19 ADC5 SCL 
-   RXD  D0 PD0|     |PC4  D18 ADC4 SDA 
-   TXD  D1 PD1|  A  |PC3  D17 ADC3     
-  INT0  D2 PD2|  T  |PC2  D16 ADC2     
-  INT1  D3 PD3|  m  |PC1  D15 ADC1     
-        D4 PD4|  e  |PC0  D14 ADC0     
-           VCC|  g  |GND               
-           GND|  a  |AREF              
- XTAL1 D20 PB6|  3  |AVCC              
- XTAL2 D21 PB7|  2  |PB5  D13 SCK      
-  OC0B  D5 PD5|  8  |PB4  D12 MISO     
-  OC0A  D6 PD6|  P  |PB3  D11 MOSI OC2A
-        D7 PD7|     |PB2  D10 SS   OC1B
-        D8 PB0|_____|PB1  D9       OC1A
+$ dip --alt --pin2 atmega328p_minicore.toml
+                   _____
+#RESET D22 PC6   1|*    |28  PC5  D19 ADC5 SCL 
+   RXD  D0 PD0   2|     |27  PC4  D18 ADC4 SDA 
+   TXD  D1 PD1   3|  A  |26  PC3  D17 ADC3     
+  INT0  D2 PD2   4|  T  |25  PC2  D16 ADC2     
+  INT1  D3 PD3   5|  m  |24  PC1  D15 ADC1     
+        D4 PD4   6|  e  |23  PC0  D14 ADC0     
+           VCC   7|  g  |22  GND               
+           GND   8|  a  |21  AREF              
+ XTAL1 D20 PB6   9|  3  |20  AVCC              
+ XTAL2 D21 PB7  10|  2  |19  PB5  D13 SCK      
+  OC0B  D5 PD5  11|  8  |18  PB4  D12 MISO     
+  OC0A  D6 PD6  12|  P  |17  PB3  D11 MOSI OC2A
+        D7 PD7  13|     |16  PB2  D10 SS   OC1B
+        D8 PB0  14|_____|15  PB1  D9       OC1A
+            ATmega328P/MiniCore
+
 ```
 
 Note that this program is my first [Rust](https://www.rust-lang.org/)
