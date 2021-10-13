@@ -1,3 +1,5 @@
+[![Release](https://img.shields.io/github/v/release/tgtakaoka/dip.svg?maxAge=3600)](https://github.com/tgtakaoka/do[/releases)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/tgtakaoka/dip/blob/main/LICENSE.md)
 [![Rust](https://github.com/tgtakaoka/dip/actions/workflows/rust.yml/badge.svg)](https://github.com/tgtakaoka/dip/actions/workflows/rust.yml)
 
 ## DIP (Dual-In-Line Package) pinout drawing
@@ -38,8 +40,8 @@ width = 300               P0 3|  4  |14 Q0
 ```
 
 You can define alternate names for a pin by separating names with a
-comma, like so. `dip` can generate bottom-side as well view which can
-be handy for soldering.
+comma. `dip` can generate bottom-side view as well, which is handy for
+soldering.
 
 ```
 $ grep PB3 atmega328p_minicore.toml
