@@ -2,9 +2,15 @@ name: Rust
 
 on:
   push:
-    branches: [ main, devel ]
+    branches:
+      - main
+    tags-ignore:
+      - '*.*.*'
+    paths-ignore:
+      - ".github/**"
+      - "*.md"
+      - "samples/*"
   pull_request:
-    branches: [ main ]
 
 env:
   CARGO_TERM_COLOR: always
