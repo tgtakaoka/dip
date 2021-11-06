@@ -193,7 +193,7 @@ impl Dip {
             let spc = if pos == bottom { '_' } else { ' ' };
             line.push('|');
             for c in 0..self.dip_width() {
-                let print_name = side == Side::TOP && c == center;
+                let print_name = c == center;
                 if lpin == 1 && c == left {
                     line.push('*');
                 } else if rpin == 1 && c == right {
@@ -258,7 +258,7 @@ impl Dip {
         let right = left + name_chars.len();
         for l in 1..=height {
             let mut line = String::new();
-            let print_name = side == Side::TOP && l == center;
+            let print_name = l == center;
             let mut tpin = tstart;
             let mut bpin = bstart;
             for pos in 1..=width {
