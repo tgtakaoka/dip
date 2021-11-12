@@ -23,6 +23,7 @@ pub struct Dip {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum DipWidth {
     MIL300,
+    MIL500,
     MIL600,
 }
 
@@ -229,6 +230,7 @@ impl Dip {
     fn dip_width(&self) -> usize {
         match self.width {
             DipWidth::MIL300 => 5,
+            DipWidth::MIL500 => 7,
             DipWidth::MIL600 => 9,
         }
     }
@@ -367,6 +369,7 @@ impl Dip {
     fn dip_height(&self) -> usize {
         match self.width {
             DipWidth::MIL300 => 4,
+            DipWidth::MIL500 => 5,
             DipWidth::MIL600 => 6,
         }
     }
@@ -559,6 +562,7 @@ impl FromStr for Dip {
             Some(v) => match v.as_integer() {
                 None => return Err("width must be number in mil".to_string()),
                 Some(w) if w == 300 => DipWidth::MIL300,
+                Some(w) if w == 500 => DipWidth::MIL500,
                 Some(w) if w == 600 => DipWidth::MIL600,
                 Some(w) => return Err(format!("width {} must be 300 or 600 mil", w)),
             },
