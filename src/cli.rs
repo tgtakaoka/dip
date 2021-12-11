@@ -63,7 +63,7 @@ struct Opt {
     #[structopt(short = "w", long = "west")]
     west: bool,
     /// Pin number output with 1 space
-    #[structopt(long = "pin",)]
+    #[structopt(long = "pin")]
     pin: bool,
     /// Pin number output with 2 spaces
     #[structopt(long = "pin2")]

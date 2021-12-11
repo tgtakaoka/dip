@@ -13,15 +13,13 @@ fn main() {
             eprintln!("{}", err);
             exit(1);
         }
-        Ok(args) => {
-            match fs::read_to_string(&args.input) {
-                Ok(content) => content,
-                Err(_err) => {
-                    eprintln!("can't open {:?}", &args.input);
-                    exit(2);
-                }
+        Ok(args) => match fs::read_to_string(&args.input) {
+            Ok(content) => content,
+            Err(_err) => {
+                eprintln!("can't open {:?}", &args.input);
+                exit(2);
             }
-        }
+        },
     };
     let args = args_result.unwrap();
 
