@@ -25,6 +25,8 @@ pub enum DipWidth {
     MIL300,
     MIL500,
     MIL600,
+    MIL900,
+    MIL1300,
 }
 
 #[derive(Debug, PartialEq)]
@@ -232,6 +234,8 @@ impl Dip {
             DipWidth::MIL300 => 5,
             DipWidth::MIL500 => 7,
             DipWidth::MIL600 => 9,
+            DipWidth::MIL900 => 15,
+            DipWidth::MIL1300 => 23,
         }
     }
 
@@ -371,6 +375,8 @@ impl Dip {
             DipWidth::MIL300 => 4,
             DipWidth::MIL500 => 5,
             DipWidth::MIL600 => 6,
+            DipWidth::MIL900 => 8,
+            DipWidth::MIL1300 => 13,
         }
     }
 
@@ -549,8 +555,8 @@ impl FromStr for Dip {
             Some(v) => match v.as_integer() {
                 None => return Err("dip package must be number".to_string()),
                 Some(n) if n <= 0 => return Err(format!("dip package {} must be positive", n)),
-                Some(n) if n >= 50 => {
-                    return Err(format!("dip package {} must be less than 50", n))
+                Some(n) if n >= 80 => {
+                    return Err(format!("dip package {} must be less than 80", n))
                 }
                 Some(n) if n % 2 != 0 => return Err(format!("dip package {} must be even", n)),
                 Some(n) => usize::try_from(n).ok().unwrap(),
@@ -564,7 +570,9 @@ impl FromStr for Dip {
                 Some(w) if w == 300 => DipWidth::MIL300,
                 Some(w) if w == 500 => DipWidth::MIL500,
                 Some(w) if w == 600 => DipWidth::MIL600,
-                Some(w) => return Err(format!("width {} must be 300 or 600 mil", w)),
+                Some(w) if w == 900 => DipWidth::MIL900,
+                Some(w) if w == 1300 => DipWidth::MIL1300,
+                Some(w) => return Err(format!("unknown DIP width {}", w)),
             },
         };
 
@@ -686,8 +694,8 @@ fn test_decode_error() {
         Some("dip package -2 must be positive".to_string())
     );
     assert_eq!(
-        Dip::from_str("name = \"SN7400\"\ndip = 50").err(),
-        Some("dip package 50 must be less than 50".to_string())
+        Dip::from_str("name = \"SN7400\"\ndip = 80").err(),
+        Some("dip package 80 must be less than 80".to_string())
     );
     assert_eq!(
         Dip::from_str("name = \"SN7400\"\ndip = 7").err(),
@@ -702,8 +710,12 @@ fn test_decode_error() {
         Some("width must be number in mil".to_string())
     );
     assert_eq!(
-        Dip::from_str("name = \"SN7400\"\ndip = 8\nwidth = 400").err(),
-        Some("width 400 must be 300 or 600 mil".to_string())
+        Dip::from_str("name = \"SN7400\"\ndip = 8\nwidth = 200").err(),
+        Some("unknown DIP width 200".to_string())
+    );
+    assert_eq!(
+        Dip::from_str("name = \"SN7400\"\ndip = 8\nwidth = 350").err(),
+        Some("unknown DIP width 350".to_string())
     );
     assert_eq!(
         Dip::from_str(
@@ -752,7 +764,7 @@ fn test_decode_error() {
          "#
         )
         .err(),
-        Some("duplicate key: `1` at line 1 column 1".to_string())
+        Some("TOML parse error at line 6, column 13\n  |\n6 |             1 = \"pin2\"\n  |             ^\nduplicate key `1` in document root\n".to_string())
     );
     assert_eq!(
         Dip::from_str(
