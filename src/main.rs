@@ -1,5 +1,7 @@
 mod cli;
 mod dip;
+mod pin;
+mod print;
 
 use dip::Dip;
 use std::fs;

@@ -1,6 +1,8 @@
 extern crate unicode_segmentation;
 
 use crate::cli::{AltNames, Direction, PinGap, Side};
+use crate::pin::PinName;
+use crate::print;
 use core::iter::Iterator;
 use std::cmp::{max, min};
 use std::collections::BTreeMap;
@@ -27,67 +29,6 @@ pub enum DipWidth {
     MIL600,
     MIL900,
     MIL1300,
-}
-
-#[derive(Debug, PartialEq)]
-struct PinName {
-    names: String, // pin names, separated by comma.
-}
-
-impl PinName {
-    fn names(&self) -> Vec<&str> {
-        self.names.split(',').map(str::trim).collect()
-    }
-
-    fn name(&self) -> &str {
-        self.names().get(0).unwrap()
-    }
-
-    fn names_horizontal(&self, names_width: &Vec<usize>, left: bool) -> String {
-        let column = names_width.len();
-        let names: Vec<&str> = self.names();
-        let mut line = String::new();
-        for c in 0..column {
-            if c != 0 {
-                line.push(' ');
-            }
-            if left {
-                let n = column - c - 1;
-                if n >= names.len() {
-                    line.push_str(&print_spaces(names_width[n]));
-                } else {
-                    line.push_str(&print_right(names_width[n], names[n]));
-                }
-            } else {
-                if c < names.len() {
-                    line.push_str(&print_left(names_width[c], names[c]));
-                }
-            }
-        }
-
-        line
-    }
-
-    fn names_vertical(&self, names_width: &Vec<usize>, top: bool) -> Vec<String> {
-        let column = names_width.len();
-        let names: Vec<&str> = self.names();
-        let mut out: Vec<String> = Vec::new();
-        for c in 0..column {
-            if c != 0 {
-                out.push(String::from(" "));
-            }
-            if top {
-                let n = column - 1 - c;
-                let text = if n < names.len() { names[n] } else { "" };
-                out.append(&mut print_bottom(names_width[n], text));
-            } else {
-                let text = if c < names.len() { names[c] } else { "" };
-                out.append(&mut print_top(names_width[c], text));
-            }
-        }
-
-        out
-    }
 }
 
 impl Dip {
@@ -168,8 +109,8 @@ impl Dip {
 
         let mut out = Vec::new();
         let mut line = String::new();
-        line.push_str(&print_right(lmax + lpin_width + 1, " "));
-        line.push_str(&print_chars(self.dip_width(), '_'));
+        line.push_str(&print::right(lmax + lpin_width + 1, " "));
+        line.push_str(&print::chars(self.dip_width(), '_'));
         out.push(line);
 
         let bottom = self.dip / 2;
@@ -185,12 +126,12 @@ impl Dip {
         let mut rpin = rstart;
         for pos in 1..=bottom {
             let mut line = String::new();
-            line.push_str(&print_right(
+            line.push_str(&print::right(
                 lmax,
                 &self.pin(lpin).names_horizontal(&lmaxes, true),
             ));
             if show_pin != PinGap::NONE {
-                line.push_str(&print_right(lpin_width, &lpin.to_string()));
+                line.push_str(&print::right(lpin_width, &lpin.to_string()));
             }
 
             let spc = if pos == bottom { '_' } else { ' ' };
@@ -210,9 +151,9 @@ impl Dip {
             line.push('|');
 
             if show_pin != PinGap::NONE {
-                line.push_str(&print_left(rpin_width, &rpin.to_string()));
+                line.push_str(&print::left(rpin_width, &rpin.to_string()));
             }
-            line.push_str(&print_left(
+            line.push_str(&print::left(
                 rmax,
                 &self.pin(rpin).names_horizontal(&rmaxes, false),
             ));
@@ -223,7 +164,7 @@ impl Dip {
         }
         if show_pin != PinGap::NONE {
             let width = lmax + lpin_width + 1 + (self.dip_width() + self.title.len()) / 2;
-            out.push(print_right(width, &self.title));
+            out.push(print::right(width, &self.title));
         }
 
         out
@@ -300,7 +241,7 @@ impl Dip {
 
         if show_pin != PinGap::NONE {
             let width = (self.dip + 1 + self.title.len()) / 2;
-            out.push(print_right(width, &self.title));
+            out.push(print::right(width, &self.title));
         }
 
         out
@@ -330,7 +271,7 @@ impl Dip {
                     line.push_str(&name_chars[l]);
                 }
                 if show_pin != PinGap::NONE {
-                    let pin_chars = print_bottom(pin_height, &pin.to_string());
+                    let pin_chars = print::bottom(pin_height, &pin.to_string());
                     for l in 0..pin_height {
                         let line = &mut pins[l];
                         line.push(' ');
@@ -347,7 +288,7 @@ impl Dip {
         } else {
             for _ in 1..=width {
                 if show_pin != PinGap::NONE {
-                    let pin_chars = print_top(pin_height, &pin.to_string());
+                    let pin_chars = print::top(pin_height, &pin.to_string());
                     for l in 0..pin_height {
                         let line = &mut pins[l];
                         line.push(' ');
@@ -436,82 +377,6 @@ fn pin_step(pin: usize, start: usize, end: usize) -> usize {
     }
 }
 
-fn print_left(width: usize, text: &str) -> String {
-    let mut out = String::from(text);
-    if width >= text.len() {
-        out.push_str(&print_spaces(width - text.len()));
-    }
-
-    out
-}
-
-fn print_right(width: usize, text: &str) -> String {
-    let mut out = String::new();
-    if width >= text.len() {
-        out.push_str(&print_spaces(width - text.len()));
-    }
-    out.push_str(text);
-
-    out
-}
-
-#[test]
-fn test_print_left_right() {
-    assert_eq!(print_left(5, "AB"), "AB   ");
-    assert_eq!(print_right(5, "AB"), "   AB");
-}
-
-fn print_top(height: usize, text: &str) -> Vec<String> {
-    let mut out = text
-        .graphemes(true)
-        .map(String::from)
-        .collect::<Vec<String>>();
-    let len = out.len();
-    if height > len {
-        for _ in 0..(height - len) {
-            out.push(String::from(" "));
-        }
-    }
-
-    out
-}
-
-fn print_bottom(height: usize, text: &str) -> Vec<String> {
-    let mut chars = text
-        .graphemes(true)
-        .map(String::from)
-        .collect::<Vec<String>>();
-    let len = chars.len();
-    let mut out: Vec<String> = Vec::new();
-    if height > len {
-        for _ in 0..(height - len) {
-            out.push(String::from(" "));
-        }
-    }
-    out.append(&mut chars);
-
-    out
-}
-
-#[test]
-fn test_print_top_bottom() {
-    assert_eq!(print_top(5, "AB"), vec!["A", "B", " ", " ", " "]);
-    assert_eq!(print_bottom(5, "AB"), vec![" ", " ", " ", "A", "B"]);
-}
-
-fn print_spaces(width: usize) -> String {
-    print_chars(width, ' ')
-}
-
-fn print_chars(width: usize, c: char) -> String {
-    let mut out = String::new();
-    for _ in 0..width {
-        out.push(c);
-    }
-
-    out
-}
-
 impl fmt::Display for Dip {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[name={} ", self.name)?;
@@ -586,15 +451,6 @@ impl FromStr for Dip {
                 pins,
             }),
         }
-    }
-}
-
-impl FromStr for PinName {
-    type Err = String;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(PinName {
-            names: s.to_string(),
-        })
     }
 }
 
