@@ -9,8 +9,7 @@ use std::collections::BTreeMap;
 use std::convert::TryFrom;
 use std::fmt;
 use std::str::FromStr;
-use toml::map::Map;
-use toml::Value;
+use toml::Table;
 use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Debug, PartialEq)]
@@ -393,11 +392,10 @@ impl fmt::Display for Dip {
 impl FromStr for Dip {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let v = match s.parse::<Value>() {
+        let toml = match s.trim().parse::<Table>() {
             Err(err) => return Err(err.to_string()),
             Ok(p) => p,
         };
-        let toml = v.as_table().unwrap();
 
         let name = match toml.get("name") {
             None => return Err("no name".to_string()),
@@ -441,7 +439,7 @@ impl FromStr for Dip {
             },
         };
 
-        match pins_to_vec_result(toml, dip) {
+        match pins_to_vec_result(&toml, dip) {
             Err(err) => Err(err),
             Ok(pins) => Ok(Dip {
                 name,
@@ -455,7 +453,7 @@ impl FromStr for Dip {
 }
 
 fn pins_to_vec_result(
-    toml: &Map<String, Value>,
+    toml: &Table,
     dip: usize,
 ) -> Result<BTreeMap<usize, PinName>, String> {
     let mut pins = BTreeMap::new();
@@ -620,7 +618,7 @@ fn test_decode_error() {
          "#
         )
         .err(),
-        Some("TOML parse error at line 6, column 13\n  |\n6 |             1 = \"pin2\"\n  |             ^\nduplicate key `1` in document root\n".to_string())
+        Some("TOML parse error at line 5, column 13\n  |\n5 |             1 = \"pin2\"\n  |             ^\nduplicate key\n".to_string())
     );
     assert_eq!(
         Dip::from_str(
