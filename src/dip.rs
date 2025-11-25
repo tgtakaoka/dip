@@ -392,10 +392,7 @@ impl fmt::Display for Dip {
 impl FromStr for Dip {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let toml = match s.trim().parse::<Table>() {
-            Err(err) => return Err(err.to_string()),
-            Ok(p) => p,
-        };
+        let toml = s.trim().parse::<Table>().map_err(|err| err.to_string())?;
 
         let name = match toml.get("name") {
             None => return Err("no name".to_string()),
