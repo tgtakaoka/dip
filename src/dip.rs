@@ -1,6 +1,7 @@
 extern crate unicode_segmentation;
 
 use crate::cli::{AltNames, Direction, PinGap, Side};
+use crate::package::Package;
 use crate::pin::PinName;
 use crate::print;
 use core::iter::Iterator;
@@ -386,6 +387,30 @@ impl fmt::Display for Dip {
             write!(f, "{} ", self.pin(pin).name())?;
         }
         write!(f, "{}]]", self.pin(self.dip).name())
+    }
+}
+
+impl Package for Dip {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn title(&self) -> &str {
+        &self.title
+    }
+
+    fn pin_count(&self) -> usize {
+        self.dip
+    }
+
+    fn print(
+        &self,
+        dir: Direction,
+        side: Side,
+        show_pin: PinGap,
+        show_alt: AltNames,
+    ) -> Vec<String> {
+        self.print(dir, side, show_pin, show_alt)
     }
 }
 
