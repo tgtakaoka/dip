@@ -2,7 +2,7 @@
 # https://github.com/tgtakaoka/dip
 name = "N80C187"
 title = "N80C187"
-qfj = 44
+plcc = 44
 pin1 = "top-center"
  1 = "VCC"
  2 = "VSS"
