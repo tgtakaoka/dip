@@ -1,0 +1,298 @@
+name = "CPU40"
+title = "Z80-CPU"
+dip = 40
+width = 600
+1 = "A11"
+2 = "A12"
+3 = "A13"
+4 = "A14"
+5 = "A15"
+6 = "CLK"
+7 = "D4"
+8 = "D3"
+9 = "D5"
+10 = "D6"
+11 = "VCC"
+12 = "D2"
+13 = "D7"
+14 = "D0"
+15 = "D1"
+16 = "INT"
+17 = "NMI"
+18 = "HALT"
+19 = "MREQ"
+20 = "IORQ"
+21 = "RD"
+22 = "WR"
+23 = "BACK"
+24 = "WAIT"
+25 = "BREQ"
+26 = "#RST"
+27 = "M1"
+28 = "RFSH"
+29 = "GND"
+30 = "A0"
+31 = "A1"
+32 = "A2"
+33 = "A3"
+34 = "A4"
+35 = "A5"
+36 = "A6"
+37 = "A7"
+38 = "A8"
+39 = "A9"
+40 = "A10"
+
+--- --north
+                         R   # B W B
+ A                     G F   R R A A
+ 1 A A A A A A A A A A N S M S E I C W R
+ 0 9 8 7 6 5 4 3 2 1 0 D H 1 T Q T K R D
++---------------------------------------+
+|                                       |
+|                                       |
+|                Z80-CPU                |
+|*                                      |
++---------------------------------------+
+ A A A A A C D D D D V D D D D I N H M I
+ 1 1 1 1 1 L 4 3 5 6 C 2 7 0 1 N M A R O
+ 1 2 3 4 5 K         C         T I L E R
+                                   T Q Q
+
+--- --north --bottom
+     B W B #   R
+     A A R R   F G                     A
+ R W C I E S M S N A A A A A A A A A A 1
+ D R K T Q T 1 H D 0 1 2 3 4 5 6 7 8 9 0
++---------------------------------------+
+|                                       |
+|                                       |
+|                Z80-CPU                |
+|                                      *|
++---------------------------------------+
+ I M H N I D D D D V D D D D C A A A A A
+ O R A M N 1 0 7 2 C 6 5 3 4 L 1 1 1 1 1
+ R E L I T         C         K 5 4 3 2 1
+ Q Q T
+
+--- --south
+ I M H
+ O R A N I         V         C A A A A A
+ R E L M N D D D D C D D D D L 1 1 1 1 1
+ Q Q T I T 1 0 7 2 C 6 5 3 4 K 5 4 3 2 1
++---------------------------------------+
+|                                      *|
+|                                       |
+|                Z80-CPU                |
+|                                       |
++---------------------------------------+
+ R W B W B # M R G A A A A A A A A A A A
+ D R A A R R 1 F N 0 1 2 3 4 5 6 7 8 9 1
+     C I E S   S D                     0
+     K T Q T   H
+
+--- --south --bottom
+                                   H M I
+ A A A A A C         V         I N A R O
+ 1 1 1 1 1 L D D D D C D D D D N M L E R
+ 1 2 3 4 5 K 4 3 5 6 C 2 7 0 1 T I T Q Q
++---------------------------------------+
+|*                                      |
+|                                       |
+|                Z80-CPU                |
+|                                       |
++---------------------------------------+
+ A A A A A A A A A A A G R M # B W B W R
+ 1 9 8 7 6 5 4 3 2 1 0 N F 1 R R A A R D
+ 0                     D S   S E I C
+                         H   T Q T K
+
+--- --east
+     +----------+
+ A11 |*         | A10
+ A12 |          | A9
+ A13 |          | A8
+ A14 |          | A7
+ A15 |          | A6
+ CLK |          | A5
+  D4 |     Z    | A4
+  D3 |     8    | A3
+  D5 |     0    | A2
+  D6 |     -    | A1
+ VCC |     C    | A0
+  D2 |     P    | GND
+  D7 |     U    | RFSH
+  D0 |          | M1
+  D1 |          | #RST
+ INT |          | BREQ
+ NMI |          | WAIT
+HALT |          | BACK
+MREQ |          | WR
+IORQ |          | RD
+     +----------+
+
+--- --east --bottom
+     +----------+
+ A10 |         *| A11
+  A9 |          | A12
+  A8 |          | A13
+  A7 |          | A14
+  A6 |          | A15
+  A5 |          | CLK
+  A4 |     Z    | D4
+  A3 |     8    | D3
+  A2 |     0    | D5
+  A1 |     -    | D6
+  A0 |     C    | VCC
+ GND |     P    | D2
+RFSH |     U    | D7
+  M1 |          | D0
+#RST |          | D1
+BREQ |          | INT
+WAIT |          | NMI
+BACK |          | HALT
+  WR |          | MREQ
+  RD |          | IORQ
+     +----------+
+
+--- --west
+     +----------+
+  RD |          | IORQ
+  WR |          | MREQ
+BACK |          | HALT
+WAIT |          | NMI
+BREQ |          | INT
+#RST |          | D1
+  M1 |     Z    | D0
+RFSH |     8    | D7
+ GND |     0    | D2
+  A0 |     -    | VCC
+  A1 |     C    | D6
+  A2 |     P    | D5
+  A3 |     U    | D3
+  A4 |          | D4
+  A5 |          | CLK
+  A6 |          | A15
+  A7 |          | A14
+  A8 |          | A13
+  A9 |          | A12
+ A10 |         *| A11
+     +----------+
+
+--- --west --bottom
+     +----------+
+IORQ |          | RD
+MREQ |          | WR
+HALT |          | BACK
+ NMI |          | WAIT
+ INT |          | BREQ
+  D1 |          | #RST
+  D0 |     Z    | M1
+  D7 |     8    | RFSH
+  D2 |     0    | GND
+ VCC |     -    | A0
+  D6 |     C    | A1
+  D5 |     P    | A2
+  D3 |     U    | A3
+  D4 |          | A4
+ CLK |          | A5
+ A15 |          | A6
+ A14 |          | A7
+ A13 |          | A8
+ A12 |          | A9
+ A11 |*         | A10
+     +----------+
+
+--- --north --pin
+                         R   # B W B
+ A                     G F   R R A A
+ 1 A A A A A A A A A A N S M S E I C W R
+ 0 9 8 7 6 5 4 3 2 1 0 D H 1 T Q T K R D
+
+ 4 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2
+ 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1
++---------------------------------------+
+|                                       |
+|                                       |
+|                Z80-CPU                |
+|*                                      |
++---------------------------------------+
+ 1 2 3 4 5 6 7 8 9 1 1 1 1 1 1 1 1 1 1 2
+                   0 1 2 3 4 5 6 7 8 9 0
+
+ A A A A A C D D D D V D D D D I N H M I
+ 1 1 1 1 1 L 4 3 5 6 C 2 7 0 1 N M A R O
+ 1 2 3 4 5 K         C         T I L E R
+                                   T Q Q
+                 Z80-CPU
+
+--- --south --pin
+ I M H
+ O R A N I         V         C A A A A A
+ R E L M N D D D D C D D D D L 1 1 1 1 1
+ Q Q T I T 1 0 7 2 C 6 5 3 4 K 5 4 3 2 1
+
+ 2 1 1 1 1 1 1 1 1 1 1
+ 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1
++---------------------------------------+
+|                                      *|
+|                                       |
+|                Z80-CPU                |
+|                                       |
++---------------------------------------+
+ 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4
+ 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+
+ R W B W B # M R G A A A A A A A A A A A
+ D R A A R R 1 F N 0 1 2 3 4 5 6 7 8 9 1
+     C I E S   S D                     0
+     K T Q T   H
+                 Z80-CPU
+
+--- --east --pin
+         +----------+
+ A11   1 |*         |40  A10
+ A12   2 |          |39  A9
+ A13   3 |          |38  A8
+ A14   4 |          |37  A7
+ A15   5 |          |36  A6
+ CLK   6 |          |35  A5
+  D4   7 |     Z    |34  A4
+  D3   8 |     8    |33  A3
+  D5   9 |     0    |32  A2
+  D6  10 |     -    |31  A1
+ VCC  11 |     C    |30  A0
+  D2  12 |     P    |29  GND
+  D7  13 |     U    |28  RFSH
+  D0  14 |          |27  M1
+  D1  15 |          |26  #RST
+ INT  16 |          |25  BREQ
+ NMI  17 |          |24  WAIT
+HALT  18 |          |23  BACK
+MREQ  19 |          |22  WR
+IORQ  20 |          |21  RD
+         +----------+
+
+--- --west --pin
+         +----------+
+  RD  21 |          |20  IORQ
+  WR  22 |          |19  MREQ
+BACK  23 |          |18  HALT
+WAIT  24 |          |17  NMI
+BREQ  25 |          |16  INT
+#RST  26 |          |15  D1
+  M1  27 |     Z    |14  D0
+RFSH  28 |     8    |13  D7
+ GND  29 |     0    |12  D2
+  A0  30 |     -    |11  VCC
+  A1  31 |     C    |10  D6
+  A2  32 |     P    |9   D5
+  A3  33 |     U    |8   D3
+  A4  34 |          |7   D4
+  A5  35 |          |6   CLK
+  A6  36 |          |5   A15
+  A7  37 |          |4   A14
+  A8  38 |          |3   A13
+  A9  39 |          |2   A12
+ A10  40 |         *|1   A11
+         +----------+

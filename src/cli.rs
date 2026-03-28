@@ -11,31 +11,30 @@ pub struct Args {
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Side {
-    TOP,
-    BOTTOM,
+    Top,
+    Bottom,
 }
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Direction {
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST,
+    North,
+    East,
+    South,
+    West,
 }
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum PinGap {
-    NONE,
-    PIN1,
-    PIN2,
+    None,
+    Pin1,
 }
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum AltNames {
-    NONE,
-    ALT1,
-    ALT2,
-    ALL,
+    None,
+    Alt1,
+    Alt2,
+    All,
 }
 
 #[derive(StructOpt, Debug)]
@@ -62,12 +61,9 @@ struct Opt {
     /// West direction output
     #[structopt(short = "w", long = "west")]
     west: bool,
-    /// Pin number output with 1 space
+    /// Pin number output
     #[structopt(long = "pin")]
     pin: bool,
-    /// Pin number output with 2 spaces
-    #[structopt(long = "pin2")]
-    pin2: bool,
     /// All alternate names output
     #[structopt(long = "alt")]
     alt: bool,
@@ -81,42 +77,36 @@ struct Opt {
 
 const ERR_SIDE: &str = "Both -t and -b are specified";
 const ERR_DIRECTION: &str = "More than one of -n -e -s -w are specified";
-const ERR_PIN_NUMBER: &str = "Both --pin and --pin2 are specified";
 const ERR_ALT_NAMES: &str = "More than one of --alt --alt1 --alt2 are specified";
 
 fn parse_side(opt: &Opt) -> Result<Side, String> {
     match (opt.top, opt.bottom) {
         (true, true) => Err(ERR_SIDE.to_string()),
-        (false, true) => Ok(Side::BOTTOM),
-        (_, false) => Ok(Side::TOP),
+        (false, true) => Ok(Side::Bottom),
+        (_, false) => Ok(Side::Top),
     }
 }
 
 fn parse_direction(opt: &Opt) -> Result<Direction, String> {
     match (opt.north, opt.east, opt.south, opt.west) {
-        (_, false, false, false) => Ok(Direction::NORTH),
-        (false, true, false, false) => Ok(Direction::EAST),
-        (false, false, true, false) => Ok(Direction::SOUTH),
-        (false, false, false, true) => Ok(Direction::WEST),
+        (_, false, false, false) => Ok(Direction::North),
+        (false, true, false, false) => Ok(Direction::East),
+        (false, false, true, false) => Ok(Direction::South),
+        (false, false, false, true) => Ok(Direction::West),
         _ => Err(ERR_DIRECTION.to_string()),
     }
 }
 
 fn parse_pins(opt: &Opt) -> Result<PinGap, String> {
-    match (opt.pin, opt.pin2) {
-        (false, false) => Ok(PinGap::NONE),
-        (true, false) => Ok(PinGap::PIN1),
-        (false, true) => Ok(PinGap::PIN2),
-        _ => Err(ERR_PIN_NUMBER.to_string()),
-    }
+    if opt.pin { Ok(PinGap::Pin1) } else { Ok(PinGap::None) }
 }
 
 fn parse_alt_names(opt: &Opt) -> Result<AltNames, String> {
     match (opt.alt, opt.alt1, opt.alt2) {
-        (false, false, false) => Ok(AltNames::NONE),
-        (true, false, false) => Ok(AltNames::ALL),
-        (false, true, false) => Ok(AltNames::ALT1),
-        (false, false, true) => Ok(AltNames::ALT2),
+        (false, false, false) => Ok(AltNames::None),
+        (true, false, false) => Ok(AltNames::All),
+        (false, true, false) => Ok(AltNames::Alt1),
+        (false, false, true) => Ok(AltNames::Alt2),
         _ => Err(ERR_ALT_NAMES.to_string()),
     }
 }

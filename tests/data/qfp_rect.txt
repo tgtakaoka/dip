@@ -1,0 +1,339 @@
+name = "DSP44"
+title = "DSP-8x14"
+qfp = "8x14"
+1 = "VCC"
+2 = "A0"
+3 = "A1"
+4 = "A2"
+5 = "A3"
+6 = "A4"
+7 = "A5"
+8 = "A6"
+9 = "A7"
+10 = "A8"
+11 = "A9"
+12 = "A10"
+13 = "A11"
+14 = "D0"
+15 = "D1"
+16 = "D2"
+17 = "D3"
+18 = "D4"
+19 = "D5"
+20 = "D6"
+21 = "D7"
+22 = "GND"
+23 = "#WR"
+24 = "#RD"
+25 = "#CS"
+26 = "INT"
+27 = "NMI"
+28 = "HOLD"
+29 = "#RST"
+30 = "CLK"
+31 = "XTAL"
+32 = "TXD"
+33 = "RXD"
+34 = "IRQ"
+35 = "WAIT"
+36 = "BREQ"
+37 = "BACK"
+38 = "DVCC"
+39 = "DGND"
+40 = "AVCC"
+41 = "AGND"
+42 = "REF"
+43 = "OUT"
+44 = "IN"
+
+--- --north
+                    A
+            V   O R G
+      A A A C I U E N
+      2 1 0 C N T F D
+    +-----------------+
+ A3 |       *         | AVCC
+ A4 |                 | DGND
+ A5 |                 | DVCC
+ A6 |                 | BACK
+ A7 |                 | BREQ
+ A8 |                 | WAIT
+ A9 |                 | IRQ
+A10 |    DSP-8x14     | RXD
+A11 |                 | TXD
+ D0 |                 | XTAL
+ D1 |                 | CLK
+ D2 |                 | #RST
+ D3 |                 | HOLD
+ D4 |                 | NMI
+    +-----------------+
+      D D D G # # # I
+      5 6 7 N W R C N
+            D R D S T
+
+--- --north --bottom
+       A
+       G R O   V
+       N E U I C A A A
+       D F T N C 0 1 2
+     +-----------------+
+AVCC |         *       | A3
+DGND |                 | A4
+DVCC |                 | A5
+BACK |                 | A6
+BREQ |                 | A7
+WAIT |                 | A8
+ IRQ |                 | A9
+ RXD |    DSP-8x14     | A10
+ TXD |                 | A11
+XTAL |                 | D0
+ CLK |                 | D1
+#RST |                 | D2
+HOLD |                 | D3
+ NMI |                 | D4
+     +-----------------+
+       I # # # G D D D
+       N C R W N 7 6 5
+       T S D R D
+
+--- --south
+       I # # # G
+       N C R W N D D D
+       T S D R D 7 6 5
+     +-----------------+
+ NMI |                 | D4
+HOLD |                 | D3
+#RST |                 | D2
+ CLK |                 | D1
+XTAL |                 | D0
+ TXD |                 | A11
+ RXD |                 | A10
+ IRQ |    DSP-8x14     | A9
+WAIT |                 | A8
+BREQ |                 | A7
+BACK |                 | A6
+DVCC |                 | A5
+DGND |                 | A4
+AVCC |         *       | A3
+     +-----------------+
+       A R O I V A A A
+       G E U N C 0 1 2
+       N F T   C
+       D
+
+--- --south --bottom
+            G # # # I
+      D D D N W R C N
+      5 6 7 D R D S T
+    +-----------------+
+ D4 |                 | NMI
+ D3 |                 | HOLD
+ D2 |                 | #RST
+ D1 |                 | CLK
+ D0 |                 | XTAL
+A11 |                 | TXD
+A10 |                 | RXD
+ A9 |    DSP-8x14     | IRQ
+ A8 |                 | WAIT
+ A7 |                 | BREQ
+ A6 |                 | BACK
+ A5 |                 | DVCC
+ A4 |                 | DGND
+ A3 |       *         | AVCC
+    +-----------------+
+      A A A V I O R A
+      2 1 0 C N U E G
+            C   T F N
+                    D
+
+--- --east
+                A A
+      D D D D D 1 1 A A A A A A A
+      4 3 2 1 0 1 0 9 8 7 6 5 4 3
+    +-----------------------------+
+ D5 |                             | A2
+ D6 |                             | A1
+ D7 |                             | A0
+GND |                            *| VCC
+#WR |          DSP-8x14           | IN
+#RD |                             | OUT
+#CS |                             | REF
+INT |                             | AGND
+    +-----------------------------+
+      N H # C X T R I W B B D D A
+      M O R L T X X R A R A V G V
+      I L S K A D D Q I E C C N C
+        D T   L       T Q K C D C
+
+--- --east --bottom
+                     A A
+       A A A A A A A 1 1 D D D D D
+       3 4 5 6 7 8 9 0 1 0 1 2 3 4
+     +-----------------------------+
+  A2 |                             | D5
+  A1 |                             | D6
+  A0 |                             | D7
+ VCC |*                            | GND
+  IN |          DSP-8x14           | #WR
+ OUT |                             | #RD
+ REF |                             | #CS
+AGND |                             | INT
+     +-----------------------------+
+       A D D B B W I R T X C # H N
+       V G V A R A R X X T L R O M
+       C N C C E I Q D D A K S L I
+       C D C K Q T       L   T D
+
+--- --west
+       A D D B B W       X   # H
+       V G V A R A I R T T C R O N
+       C N C C E I R X X A L S L M
+       C D C K Q T Q D D L K T D I
+     +-----------------------------+
+AGND |                             | INT
+ REF |                             | #CS
+ OUT |                             | #RD
+  IN |                             | #WR
+ VCC |*         DSP-8x14           | GND
+  A0 |                             | D7
+  A1 |                             | D6
+  A2 |                             | D5
+     +-----------------------------+
+       A A A A A A A A A D D D D D
+       3 4 5 6 7 8 9 1 1 0 1 2 3 4
+                     0 1
+
+--- --west --bottom
+        H #   X       W B B D D A
+      N O R C T T R I A R A V G V
+      M L S L A X X R I E C C N C
+      I D T K L D D Q T Q K C D C
+    +-----------------------------+
+INT |                             | AGND
+#CS |                             | REF
+#RD |                             | OUT
+#WR |                             | IN
+GND |          DSP-8x14          *| VCC
+ D7 |                             | A0
+ D6 |                             | A1
+ D5 |                             | A2
+    +-----------------------------+
+      D D D D D A A A A A A A A A
+      4 3 2 1 0 1 1 9 8 7 6 5 4 3
+                1 0
+
+--- --north --pin
+                        A
+                V   O R G
+          A A A C I U E N
+          2 1 0 C N T F D
+
+                  4 4 4 4
+          4 3 2 1 4 3 2 1
+        +-----------------+
+ A3   5 |       *         | 40  AVCC
+ A4   6 |                 | 39  DGND
+ A5   7 |                 | 38  DVCC
+ A6   8 |                 | 37  BACK
+ A7   9 |                 | 36  BREQ
+ A8  10 |                 | 35  WAIT
+ A9  11 |                 | 34  IRQ
+A10  12 |    DSP-8x14     | 33  RXD
+A11  13 |                 | 32  TXD
+ D0  14 |                 | 31  XTAL
+ D1  15 |                 | 30  CLK
+ D2  16 |                 | 29  #RST
+ D3  17 |                 | 28  HOLD
+ D4  18 |                 | 27  NMI
+        +-----------------+
+          1 2 2 2 2 2 2 2
+          9 0 1 2 3 4 5 6
+
+          D D D G # # # I
+          5 6 7 N W R C N
+                D R D S T
+              DSP-8x14
+
+--- --south --pin
+           I # # # G
+           N C R W N D D D
+           T S D R D 7 6 5
+
+           2 2 2 2 2 2 2 1
+           6 5 4 3 2 1 0 9
+         +-----------------+
+ NMI  27 |                 | 18  D4
+HOLD  28 |                 | 17  D3
+#RST  29 |                 | 16  D2
+ CLK  30 |                 | 15  D1
+XTAL  31 |                 | 14  D0
+ TXD  32 |                 | 13  A11
+ RXD  33 |                 | 12  A10
+ IRQ  34 |    DSP-8x14     | 11  A9
+WAIT  35 |                 | 10  A8
+BREQ  36 |                 | 9   A7
+BACK  37 |                 | 8   A6
+DVCC  38 |                 | 7   A5
+DGND  39 |                 | 6   A4
+AVCC  40 |         *       | 5   A3
+         +-----------------+
+           4 4 4 4 1 2 3 4
+           1 2 3 4
+
+           A R O I V A A A
+           G E U N C 0 1 2
+           N F T   C
+           D
+              DSP-8x14
+
+--- --east --pin
+                    A A
+          D D D D D 1 1 A A A A A A A
+          4 3 2 1 0 1 0 9 8 7 6 5 4 3
+
+          1 1 1 1 1 1 1 1 1
+          8 7 6 5 4 3 2 1 0 9 8 7 6 5
+        +-----------------------------+
+ D5  19 |                             | 4   A2
+ D6  20 |                             | 3   A1
+ D7  21 |                             | 2   A0
+GND  22 |                            *| 1   VCC
+#WR  23 |          DSP-8x14           | 44  IN
+#RD  24 |                             | 43  OUT
+#CS  25 |                             | 42  REF
+INT  26 |                             | 41  AGND
+        +-----------------------------+
+          2 2 2 3 3 3 3 3 3 3 3 3 3 4
+          7 8 9 0 1 2 3 4 5 6 7 8 9 0
+
+          N H # C X T R I W B B D D A
+          M O R L T X X R A R A V G V
+          I L S K A D D Q I E C C N C
+            D T   L       T Q K C D C
+                    DSP-8x14
+
+--- --west --pin
+           A D D B B W       X   # H
+           V G V A R A I R T T C R O N
+           C N C C E I R X X A L S L M
+           C D C K Q T Q D D L K T D I
+
+           4 3 3 3 3 3 3 3 3 3 3 2 2 2
+           0 9 8 7 6 5 4 3 2 1 0 9 8 7
+         +-----------------------------+
+AGND  41 |                             | 26  INT
+ REF  42 |                             | 25  #CS
+ OUT  43 |                             | 24  #RD
+  IN  44 |                             | 23  #WR
+ VCC   1 |*         DSP-8x14           | 22  GND
+  A0   2 |                             | 21  D7
+  A1   3 |                             | 20  D6
+  A2   4 |                             | 19  D5
+         +-----------------------------+
+           5 6 7 8 9 1 1 1 1 1 1 1 1 1
+                     0 1 2 3 4 5 6 7 8
+
+           A A A A A A A A A D D D D D
+           3 4 5 6 7 8 9 1 1 0 1 2 3 4
+                         0 1
+                    DSP-8x14

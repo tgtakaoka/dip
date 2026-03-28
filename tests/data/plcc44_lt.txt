@@ -1,0 +1,340 @@
+name = "MCU44LT"
+title = "MCU-44LT"
+plcc = 44
+pin1 = "left-top"
+1 = "VCC"
+2 = "A0"
+3 = "A1"
+4 = "A2"
+5 = "A3"
+6 = "A4"
+7 = "A5"
+8 = "A6"
+9 = "A7"
+10 = "A8"
+11 = "A9"
+12 = "A10"
+13 = "A11"
+14 = "D0"
+15 = "D1"
+16 = "D2"
+17 = "D3"
+18 = "D4"
+19 = "D5"
+20 = "D6"
+21 = "D7"
+22 = "GND"
+23 = "#WR"
+24 = "#RD"
+25 = "#CS"
+26 = "INT"
+27 = "NMI"
+28 = "HOLD"
+29 = "#RST"
+30 = "CLK"
+31 = "XTAL"
+32 = "TXD"
+33 = "RXD"
+34 = "IRQ"
+35 = "WAIT"
+36 = "BREQ"
+37 = "BACK"
+38 = "DVCC"
+39 = "DGND"
+40 = "AVCC"
+41 = "AGND"
+42 = "REF"
+43 = "OUT"
+44 = "IN"
+
+--- --north
+            A A D D B B W
+        O R G V G V A R A I
+      I U E N C N C C E I R
+      N T F D C D C K Q T Q
+     /----------------------+
+VCC |*----------------------| RXD
+ A0 |                       | TXD
+ A1 |                       | XTAL
+ A2 |                       | CLK
+ A3 |                       | #RST
+ A4 |       MCU-44LT        | HOLD
+ A5 |                       | NMI
+ A6 |                       | INT
+ A7 |                       | #CS
+ A8 |                       | #RD
+ A9 |                       | #WR
+    +-----------------------+
+      A A D D D D D D D D G
+      1 1 0 1 2 3 4 5 6 7 N
+      0 1                 D
+
+--- --north --bottom
+         W B B D D A A
+       I A R A V G V G R O
+       R I E C C N C N E U I
+       Q T Q K C D C D F T N
+     +----------------------\
+ RXD |----------------------*| VCC
+ TXD |                       | A0
+XTAL |                       | A1
+ CLK |                       | A2
+#RST |                       | A3
+HOLD |       MCU-44LT        | A4
+ NMI |                       | A5
+ INT |                       | A6
+ #CS |                       | A7
+ #RD |                       | A8
+ #WR |                       | A9
+     +-----------------------+
+       G D D D D D D D D A A
+       N 7 6 5 4 3 2 1 0 1 1
+       D                 1 0
+
+--- --south
+       G                 A A
+       N D D D D D D D D 1 1
+       D 7 6 5 4 3 2 1 0 1 0
+     +-----------------------+
+ #WR |                       | A9
+ #RD |                       | A8
+ #CS |                       | A7
+ INT |                       | A6
+ NMI |                       | A5
+HOLD |       MCU-44LT        | A4
+#RST |                       | A3
+ CLK |                       | A2
+XTAL |                       | A1
+ TXD |                       | A0
+ RXD |----------------------*| VCC
+     +----------------------/
+       I W B B D D A A R O I
+       R A R A V G V G E U N
+       Q I E C C N C N F T
+         T Q K C D C D
+
+--- --south --bottom
+      A A                 G
+      1 1 D D D D D D D D N
+      0 1 0 1 2 3 4 5 6 7 D
+    +-----------------------+
+ A9 |                       | #WR
+ A8 |                       | #RD
+ A7 |                       | #CS
+ A6 |                       | INT
+ A5 |                       | NMI
+ A4 |       MCU-44LT        | HOLD
+ A3 |                       | #RST
+ A2 |                       | CLK
+ A1 |                       | XTAL
+ A0 |                       | TXD
+VCC |*----------------------| RXD
+     \----------------------+
+      I O R A A D D B B W I
+      N U E G V G V A R A R
+        T F N C N C C E I Q
+            D C D C K Q T
+
+--- --east
+                          V
+      A A A A A A A A A A C
+      9 8 7 6 5 4 3 2 1 0 C
+    +----------------------\
+A10 |                     *|| IN
+A11 |                      || OUT
+ D0 |                      || REF
+ D1 |                      || AGND
+ D2 |                      || AVCC
+ D3 |       MCU-44LT       || DGND
+ D4 |                      || DVCC
+ D5 |                      || BACK
+ D6 |                      || BREQ
+ D7 |                      || WAIT
+GND |                      || IRQ
+    +-----------------------+
+      # # # I N H # C X T R
+      W R C N M O R L T X X
+      R D S T I L S K A D D
+                D T   L
+
+--- --east --bottom
+       V
+       C A A A A A A A A A A
+       C 0 1 2 3 4 5 6 7 8 9
+      /----------------------+
+  IN ||*                     | A10
+ OUT ||                      | A11
+ REF ||                      | D0
+AGND ||                      | D1
+AVCC ||                      | D2
+DGND ||      MCU-44LT        | D3
+DVCC ||                      | D4
+BACK ||                      | D5
+BREQ ||                      | D6
+WAIT ||                      | D7
+ IRQ ||                      | GND
+     +-----------------------+
+       R T X C # H N I # # #
+       X X T L R O M N C R W
+       D D A K S L I T S D R
+           L   T D
+
+--- --west
+           X   # H
+       R T T C R O N I # # #
+       X X A L S L M N C R W
+       D D L K T D I T S D R
+     +-----------------------+
+ IRQ ||                      | GND
+WAIT ||                      | D7
+BREQ ||                      | D6
+BACK ||                      | D5
+DVCC ||                      | D4
+DGND ||      MCU-44LT        | D3
+AVCC ||                      | D2
+AGND ||                      | D1
+ REF ||                      | D0
+ OUT ||                      | A11
+  IN ||*                     | A10
+      \----------------------+
+       V A A A A A A A A A A
+       C 0 1 2 3 4 5 6 7 8 9
+       C
+
+--- --west --bottom
+                H #   X
+      # # # I N O R C T T R
+      W R C N M L S L A X X
+      R D S T I D T K L D D
+    +-----------------------+
+GND |                      || IRQ
+ D7 |                      || WAIT
+ D6 |                      || BREQ
+ D5 |                      || BACK
+ D4 |                      || DVCC
+ D3 |       MCU-44LT       || DGND
+ D2 |                      || AVCC
+ D1 |                      || AGND
+ D0 |                      || REF
+A11 |                      || OUT
+A10 |                     *|| IN
+    +----------------------/
+      A A A A A A A A A A V
+      9 8 7 6 5 4 3 2 1 0 C
+                          C
+
+--- --north --pin
+                A A D D B B W
+            O R G V G V A R A I
+          I U E N C N C C E I R
+          N T F D C D C K Q T Q
+
+          4 4 4 4 4 3 3 3 3 3 3
+          4 3 2 1 0 9 8 7 6 5 4
+         /----------------------+
+VCC   1 |*----------------------| 33  RXD
+ A0   2 |                       | 32  TXD
+ A1   3 |                       | 31  XTAL
+ A2   4 |                       | 30  CLK
+ A3   5 |                       | 29  #RST
+ A4   6 |       MCU-44LT        | 28  HOLD
+ A5   7 |                       | 27  NMI
+ A6   8 |                       | 26  INT
+ A7   9 |                       | 25  #CS
+ A8  10 |                       | 24  #RD
+ A9  11 |                       | 23  #WR
+        +-----------------------+
+          1 1 1 1 1 1 1 1 2 2 2
+          2 3 4 5 6 7 8 9 0 1 2
+
+          A A D D D D D D D D G
+          1 1 0 1 2 3 4 5 6 7 N
+          0 1                 D
+                 MCU-44LT
+
+--- --south --pin
+           G                 A A
+           N D D D D D D D D 1 1
+           D 7 6 5 4 3 2 1 0 1 0
+
+           2 2 2 1 1 1 1 1 1 1 1
+           2 1 0 9 8 7 6 5 4 3 2
+         +-----------------------+
+ #WR  23 |                       | 11  A9
+ #RD  24 |                       | 10  A8
+ #CS  25 |                       | 9   A7
+ INT  26 |                       | 8   A6
+ NMI  27 |                       | 7   A5
+HOLD  28 |       MCU-44LT        | 6   A4
+#RST  29 |                       | 5   A3
+ CLK  30 |                       | 4   A2
+XTAL  31 |                       | 3   A1
+ TXD  32 |                       | 2   A0
+ RXD  33 |----------------------*| 1   VCC
+         +----------------------/
+           3 3 3 3 3 3 4 4 4 4 4
+           4 5 6 7 8 9 0 1 2 3 4
+
+           I W B B D D A A R O I
+           R A R A V G V G E U N
+           Q I E C C N C N F T
+             T Q K C D C D
+                 MCU-44LT
+
+--- --east --pin
+                              V
+          A A A A A A A A A A C
+          9 8 7 6 5 4 3 2 1 0 C
+
+          1 1
+          1 0 9 8 7 6 5 4 3 2 1
+        +----------------------\
+A10  12 |                     *|| 44  IN
+A11  13 |                      || 43  OUT
+ D0  14 |                      || 42  REF
+ D1  15 |                      || 41  AGND
+ D2  16 |                      || 40  AVCC
+ D3  17 |       MCU-44LT       || 39  DGND
+ D4  18 |                      || 38  DVCC
+ D5  19 |                      || 37  BACK
+ D6  20 |                      || 36  BREQ
+ D7  21 |                      || 35  WAIT
+GND  22 |                      || 34  IRQ
+        +-----------------------+
+          2 2 2 2 2 2 2 3 3 3 3
+          3 4 5 6 7 8 9 0 1 2 3
+
+          # # # I N H # C X T R
+          W R C N M O R L T X X
+          R D S T I L S K A D D
+                    D T   L
+                 MCU-44LT
+
+--- --west --pin
+               X   # H
+           R T T C R O N I # # #
+           X X A L S L M N C R W
+           D D L K T D I T S D R
+
+           3 3 3 3 2 2 2 2 2 2 2
+           3 2 1 0 9 8 7 6 5 4 3
+         +-----------------------+
+ IRQ  34 ||                      | 22  GND
+WAIT  35 ||                      | 21  D7
+BREQ  36 ||                      | 20  D6
+BACK  37 ||                      | 19  D5
+DVCC  38 ||                      | 18  D4
+DGND  39 ||      MCU-44LT        | 17  D3
+AVCC  40 ||                      | 16  D2
+AGND  41 ||                      | 15  D1
+ REF  42 ||                      | 14  D0
+ OUT  43 ||                      | 13  A11
+  IN  44 ||*                     | 12  A10
+          \----------------------+
+           1 2 3 4 5 6 7 8 9 1 1
+                             0 1
+
+           V A A A A A A A A A A
+           C 0 1 2 3 4 5 6 7 8 9
+           C
+                 MCU-44LT

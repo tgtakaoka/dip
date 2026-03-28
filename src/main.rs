@@ -1,9 +1,12 @@
+mod canvas;
 mod cli;
 mod dip;
+mod package;
 mod pin;
 mod print;
+mod quad;
 
-use dip::Dip;
+use package::Package;
 use std::fs;
 use std::process::exit;
 use std::str::FromStr;
@@ -25,13 +28,13 @@ fn main() {
     };
     let args = args_result.unwrap();
 
-    match Dip::from_str(&content) {
+    match Package::from_str(&content) {
         Err(err) => {
             eprintln!("{}", err);
             exit(3);
         }
-        Ok(dip) => {
-            for line in dip.print(args.direction, args.side, args.show_pin, args.show_alt) {
+        Ok(pkg) => {
+            for line in pkg.print(args.direction, args.side, args.show_pin, args.show_alt) {
                 println!("{}", line);
             }
         }
