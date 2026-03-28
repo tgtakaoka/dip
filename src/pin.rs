@@ -12,10 +12,10 @@ impl PinName {
     }
 
     pub fn name(&self) -> &str {
-        self.names().get(0).unwrap()
+        self.names().first().unwrap()
     }
 
-    pub fn names_horizontal(&self, names_width: &Vec<usize>, left: bool) -> String {
+    pub fn names_horizontal(&self, names_width: &[usize], left: bool) -> String {
         let column = names_width.len();
         let names: Vec<&str> = self.names();
         let mut line = String::new();
@@ -30,17 +30,15 @@ impl PinName {
                 } else {
                     line.push_str(&print::right(names_width[n], names[n]));
                 }
-            } else {
-                if c < names.len() {
-                    line.push_str(&print::left(names_width[c], names[c]));
-                }
+            } else if c < names.len() {
+                line.push_str(&print::left(names_width[c], names[c]));
             }
         }
 
         line
     }
 
-    pub fn names_vertical(&self, names_width: &Vec<usize>, top: bool) -> Vec<String> {
+    pub fn names_vertical(&self, names_width: &[usize], top: bool) -> Vec<String> {
         let column = names_width.len();
         let names: Vec<&str> = self.names();
         let mut out: Vec<String> = Vec::new();
