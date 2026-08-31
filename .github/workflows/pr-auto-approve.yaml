@@ -1,0 +1,23 @@
+name: Auto Approve
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+jobs:
+  approve:
+    # + pull request owner matches repository owner.
+    # + pull request is not a draft
+    if: |
+      github.event.pull_request.user.login == github.repository_owner
+      && ! github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Self Approve PR as github-actions bot
+        run: gh pr review --approve --body 'Self-approved as owner.' "$PR_URL"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
